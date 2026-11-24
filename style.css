@@ -747,6 +747,62 @@ button:disabled {
   text-align: center;
 }
 
+.btn-icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.btn-icon-text svg {
+  flex-shrink: 0;
+}
+
+.btn-icon-text:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.fit-controls {
+  display: flex;
+  gap: 0.2rem;
+  background: var(--color-surface-subtle);
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.fit-controls .btn-sm {
+  border: none;
+  background: transparent;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+}
+
+.fit-controls .btn-sm:hover {
+  color: var(--color-text-main);
+}
+
+.fit-controls .btn-sm.active {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.layout-controls .btn-icon-text.active {
+  background: #eff6ff;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
 #zoomResetBtn {
   min-width: 54px;
 }
@@ -756,6 +812,10 @@ button:disabled {
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   align-items: start;
+}
+
+.preview-area.is-stacked {
+  grid-template-columns: 1fr;
 }
 
 .canvas-card {
@@ -795,11 +855,32 @@ button:disabled {
   position: relative;
   overflow: auto;
   height: 48vh;
-  min-height: 320px;
+  min-height: 340px;
   border: 1px solid var(--color-border);
   background: #cbd5e1;
   border-radius: var(--radius-sm);
   display: flex;
+  transition: height 0.25s ease;
+}
+
+/* Portrait orientation gets tall, spacious canvas boxes */
+.preview-area.is-portrait .canvas-wrapper {
+  height: 64vh;
+  min-height: 460px;
+  max-height: 740px;
+}
+
+/* Landscape orientation fits widescreen slides cleanly */
+.preview-area.is-landscape .canvas-wrapper {
+  height: 46vh;
+  min-height: 320px;
+  max-height: 520px;
+}
+
+.preview-area.is-stacked.is-portrait .canvas-wrapper {
+  height: 75vh;
+  min-height: 560px;
+  max-height: 860px;
 }
 
 /* Floating Loader Overlay */
@@ -869,7 +950,11 @@ canvas {
     grid-template-columns: 1fr;
   }
   .canvas-wrapper {
-    height: 44vh;
+    height: 48vh;
+  }
+  .preview-area.is-portrait .canvas-wrapper {
+    height: 60vh;
+    min-height: 400px;
   }
   .rules-grid {
     grid-template-columns: 1fr;

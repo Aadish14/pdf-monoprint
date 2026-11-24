@@ -70,6 +70,9 @@ const state = {
   nextRuleId: 1,
   ruleMode: "basic",
   zoomLevel: 1.0,
+  fitMode: "page",
+  layoutMode: "grid",
+  pageRotations: {},
   toner: {
     darkModeInvert: false,
     bgWhitenEnabled: false,
@@ -78,6 +81,7 @@ const state = {
   cachedBuffers: null,
   debounceTimer: null,
   scrollSyncLock: null,
+  scrollSyncTimer: null,
 };
 
 /**
@@ -669,9 +673,15 @@ const AppController = {
       prevPage: document.getElementById("prevPage"),
       nextPage: document.getElementById("nextPage"),
       pageIndicator: document.getElementById("pageIndicator"),
+      rotatePageBtn: document.getElementById("rotatePageBtn"),
+      fitPageBtn: document.getElementById("fitPageBtn"),
+      fitWidthBtn: document.getElementById("fitWidthBtn"),
       zoomOutBtn: document.getElementById("zoomOutBtn"),
       zoomResetBtn: document.getElementById("zoomResetBtn"),
       zoomInBtn: document.getElementById("zoomInBtn"),
+      layoutToggleBtn: document.getElementById("layoutToggleBtn"),
+      layoutToggleText: document.getElementById("layoutToggleText"),
+      previewArea: document.querySelector(".preview-area"),
       origWrapper: document.getElementById("origWrapper"),
       outWrapper: document.getElementById("outWrapper"),
       origCanvas: document.getElementById("origCanvas"),
@@ -731,9 +741,28 @@ const AppController = {
       }
     });
 
+    if (this.dom.rotatePageBtn) {
+      this.dom.rotatePageBtn.addEventListener("click", () => this.rotateCurrentPage());
+    }
+
+    if (this.dom.fitPageBtn) {
+      this.dom.fitPageBtn.addEventListener("click", () => this.setFitMode("page"));
+    }
+
+    if (this.dom.fitWidthBtn) {
+      this.dom.fitWidthBtn.addEventListener("click", () => this.setFitMode("width"));
+    }
+
+    if (this.dom.layoutToggleBtn) {
+      this.dom.layoutToggleBtn.addEventListener("click", () => this.toggleLayoutMode());
+    }
+
     this.dom.zoomOutBtn.addEventListener("click", () => this.setZoom(state.zoomLevel - CONFIG.zoomStep));
     this.dom.zoomInBtn.addEventListener("click", () => this.setZoom(state.zoomLevel + CONFIG.zoomStep));
-    this.dom.zoomResetBtn.addEventListener("click", () => this.setZoom(1.0));
+    this.dom.zoomResetBtn.addEventListener("click", () => {
+      state.zoomLevel = 1.0;
+      this.updateZoomUI();
+    });
 
     const wheelHandler = (e) => this.handleWheelZoom(e);
     this.dom.origWrapper.addEventListener("wheel", wheelHandler, { passive: false });
@@ -867,11 +896,38 @@ const AppController = {
     }
   },
 
+  rotateCurrentPage() {
+    if (!state.pdfDoc) return;
+    const cur = state.pageRotations[state.currentPage] || 0;
+    state.pageRotations[state.currentPage] = (cur + 90) % 360;
+    this.renderPreviewPage(state.currentPage);
+  },
+
+  setFitMode(mode) {
+    if (state.fitMode === mode) return;
+    state.fitMode = mode;
+    state.zoomLevel = 1.0;
+    this.updateZoomUI();
+  },
+
+  toggleLayoutMode() {
+    state.layoutMode = state.layoutMode === "grid" ? "stacked" : "grid";
+    const isStacked = state.layoutMode === "stacked";
+    this.dom.previewArea.classList.toggle("is-stacked", isStacked);
+    this.dom.layoutToggleBtn.classList.toggle("active", isStacked);
+    if (this.dom.layoutToggleText) {
+      this.dom.layoutToggleText.textContent = isStacked ? "Stacked" : "Side-by-Side";
+    }
+    this.updateZoomUI();
+  },
+
   async renderPreviewPage(pageNum) {
     this.showPreviewLoader(true);
     const page = await state.pdfDoc.getPage(pageNum);
-    const rotation = page.rotate || 0;
-    const viewport = page.getViewport({ scale: CONFIG.previewScale, rotation });
+    const baseRotation = page.rotate || 0;
+    const userRotation = state.pageRotations[pageNum] || 0;
+    const totalRotation = (baseRotation + userRotation) % 360;
+    const viewport = page.getViewport({ scale: CONFIG.previewScale, rotation: totalRotation });
 
     this.dom.origCanvas.width = Math.floor(viewport.width);
     this.dom.origCanvas.height = Math.floor(viewport.height);
@@ -880,9 +936,14 @@ const AppController = {
 
     const isLandscape = viewport.width > viewport.height;
     const orientLabel = isLandscape ? "Landscape" : "Portrait";
-    this.dom.pageIndicator.textContent = `Page ${pageNum} / ${state.pdfDoc.numPages} (${orientLabel})`;
+    const rotateNote = userRotation !== 0 ? ` [Rotated ${userRotation}°]` : "";
+    this.dom.pageIndicator.textContent = `Page ${pageNum} / ${state.pdfDoc.numPages} (${orientLabel}${rotateNote})`;
     this.dom.prevPage.disabled = pageNum <= 1;
     this.dom.nextPage.disabled = pageNum >= state.pdfDoc.numPages;
+
+    // Dynamically toggle portrait/landscape classes on preview area
+    this.dom.previewArea.classList.toggle("is-portrait", !isLandscape);
+    this.dom.previewArea.classList.toggle("is-landscape", isLandscape);
 
     this.updateZoomUI();
     this.dom.origWrapper.scrollTop = 0;
@@ -945,12 +1006,18 @@ const AppController = {
     const wrapperAspect = availW / availH;
 
     let baseW, baseH;
-    if (canvasAspect > wrapperAspect) {
+    if (state.fitMode === "width") {
       baseW = availW;
       baseH = availW / canvasAspect;
     } else {
-      baseH = availH;
-      baseW = availH * canvasAspect;
+      // "page" mode - fit completely within container
+      if (canvasAspect > wrapperAspect) {
+        baseW = availW;
+        baseH = availW / canvasAspect;
+      } else {
+        baseH = availH;
+        baseW = availH * canvasAspect;
+      }
     }
 
     const targetW = Math.round(baseW * state.zoomLevel);
@@ -961,10 +1028,25 @@ const AppController = {
     this.dom.outCanvas.style.width = `${targetW}px`;
     this.dom.outCanvas.style.height = `${targetH}px`;
 
+    // Prevent flexbox margin: auto negative scroll clipping when overflowing
+    const overflowsY = targetH > availH;
+    const overflowsX = targetW > availW;
+    const marginY = overflowsY ? "12px" : "auto";
+    const marginX = overflowsX ? "12px" : "auto";
+    this.dom.origCanvas.style.margin = `${marginY} ${marginX}`;
+    this.dom.outCanvas.style.margin = `${marginY} ${marginX}`;
+
     const pct = `${Math.round(state.zoomLevel * 100)}%`;
     this.dom.zoomResetBtn.textContent = pct;
     this.dom.zoomOutBtn.disabled = state.zoomLevel <= CONFIG.minZoom;
     this.dom.zoomInBtn.disabled = state.zoomLevel >= CONFIG.maxZoom;
+
+    if (this.dom.fitPageBtn) {
+      this.dom.fitPageBtn.classList.toggle("active", state.fitMode === "page");
+    }
+    if (this.dom.fitWidthBtn) {
+      this.dom.fitWidthBtn.classList.toggle("active", state.fitMode === "width");
+    }
   },
 
   syncScroll(source, target, key) {
@@ -1414,7 +1496,9 @@ const AppController = {
         await new Promise((r) => setTimeout(r, 20));
 
         const firstPage = await state.pdfDoc.getPage(selectedPages[0]);
-        const rotation = firstPage.rotate || 0;
+        const baseRotation = firstPage.rotate || 0;
+        const userRotation = state.pageRotations[selectedPages[0]] || 0;
+        const rotation = (baseRotation + userRotation) % 360;
         const ptVp = firstPage.getViewport({ scale: 1.0, rotation });
         const rVp = firstPage.getViewport({ scale: renderScale, rotation });
 
@@ -1445,7 +1529,9 @@ const AppController = {
         await new Promise((r) => setTimeout(r, 20));
 
         const page = await state.pdfDoc.getPage(pageNum);
-        const rotation = page.rotate || 0;
+        const baseRotation = page.rotate || 0;
+        const userRotation = state.pageRotations[pageNum] || 0;
+        const rotation = (baseRotation + userRotation) % 360;
         const ptViewport = page.getViewport({ scale: 1.0, rotation });
         const renderViewport = page.getViewport({ scale: renderScale, rotation });
 

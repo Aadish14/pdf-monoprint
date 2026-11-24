@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PDF MonoPrint — Distinguish Colors in Monochrome PDFs</title>
   <meta name="description" content="Make Colors Distinguishable in Black &amp; White PDFs when you print with your laser or black &amp; white printer. Maps color charts into distinct hatch patterns, textures, and outlines." />
-  <link rel="stylesheet" href="style.css" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="stylesheet" href="style.css?v=2.0" />
   <!-- Local air-gapped libraries -->
   <script src="vendor/pdf.min.js"></script>
   <script src="vendor/jspdf.umd.min.js"></script>
@@ -140,25 +143,49 @@
       <!-- Toolbar -->
       <div class="preview-toolbar hidden" id="pageNav">
         <div class="toolbar-group">
-          <button id="prevPage" type="button" class="btn-nav">
+          <button id="prevPage" type="button" class="btn-nav" title="Previous Page">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             <span>Prev</span>
           </button>
           <span id="pageIndicator" class="page-indicator">Page 1 / 1</span>
-          <button id="nextPage" type="button" class="btn-nav">
+          <button id="nextPage" type="button" class="btn-nav" title="Next Page">
             <span>Next</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </button>
         </div>
 
+        <div class="toolbar-group">
+          <button id="rotatePageBtn" type="button" class="btn-icon-text" title="Rotate Page 90° Clockwise">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>Rotate 90°</span>
+          </button>
+        </div>
+
+        <div class="toolbar-group fit-controls">
+          <button id="fitPageBtn" type="button" class="btn-sm active" title="Fit whole page in container">Fit Page</button>
+          <button id="fitWidthBtn" type="button" class="btn-sm" title="Fit width of container (scroll vertically)">Fit Width</button>
+        </div>
+
         <div class="toolbar-group zoom-controls" title="Zoom buttons or Ctrl + Scroll Wheel over either preview">
           <span class="toolbar-label">Zoom:</span>
-          <button id="zoomOutBtn" type="button" aria-label="Zoom out" class="btn-icon">
+          <button id="zoomOutBtn" type="button" aria-label="Zoom out" class="btn-icon" title="Zoom Out">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
-          <button id="zoomResetBtn" type="button" title="Reset to fit container">100%</button>
-          <button id="zoomInBtn" type="button" aria-label="Zoom in" class="btn-icon">
+          <button id="zoomResetBtn" type="button" title="Reset Zoom to 100%">100%</button>
+          <button id="zoomInBtn" type="button" aria-label="Zoom in" class="btn-icon" title="Zoom In">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+        </div>
+
+        <div class="toolbar-group layout-controls">
+          <button id="layoutToggleBtn" type="button" class="btn-icon-text" title="Toggle Side-by-Side vs. Stacked View">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="12" y1="3" x2="12" y2="21"></line>
+            </svg>
+            <span id="layoutToggleText">Side-by-Side</span>
           </button>
         </div>
       </div>
@@ -227,6 +254,6 @@
     </p>
   </footer>
 
-  <script src="app.js?v=1.2"></script>
+  <script src="app.js?v=2.0"></script>
 </body>
 </html>
