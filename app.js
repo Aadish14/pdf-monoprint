@@ -274,55 +274,107 @@ const ImageEngine = {
       outGray[p] = val;
     }
 
-    const ruleMasks = rules.map((rule) => {
+    if (rules.length === 0) {
+      const result = new ImageData(width, height);
+      const rd = result.data;
+      for (let i = 0, p = 0; p < totalPixels; p++, i += 4) {
+        const val = outGray[p];
+        rd[i] = val;
+        rd[i + 1] = val;
+        rd[i + 2] = val;
+        rd[i + 3] = 255;
+      }
+      return result;
+    }
+
+    // Competitive rule assignment: determine the closest matching rule for each pixel
+    const pixelRuleIndex = new Int16Array(totalPixels);
+    pixelRuleIndex.fill(-1);
+    const pixelBestDist = new Float32Array(totalPixels);
+    pixelBestDist.fill(999999);
+
+    rules.forEach((rule, idx) => {
       const [tr, tg, tb] = ColorUtils.hexToRgb(rule.sourceHex);
       const targetHsv = ColorUtils.rgbToHsv(tr, tg, tb);
       const isNeutral = targetHsv.s < 15 || targetHsv.v < 15;
-      const mask = new Uint8Array(totalPixels);
-      const maxHueDiff = rule.tolerance * 0.65;
-      const maxRgbDistSq = Math.pow(rule.tolerance * 2.0, 2);
 
       if (isNeutral) {
-        for (let i = 0, p = 0; p < totalPixels; p++, i += 4) {
-          if (s[p] < 18 || v[p] < 18) {
+        const maxDistSq = Math.pow(rule.tolerance * 1.8, 2);
+        for (let p = 0; p < totalPixels; p++) {
+          if (s[p] < 20 || v[p] < 20) {
+            const i = p * 4;
             const dr = data[i] - tr;
             const dg = data[i + 1] - tg;
             const db = data[i + 2] - tb;
-            if (dr * dr + dg * dg + db * db <= maxRgbDistSq) mask[p] = 1;
+            const dSq = dr * dr + dg * dg + db * db;
+            if (dSq <= maxDistSq) {
+              const normDist = dSq / maxDistSq;
+              if (normDist < pixelBestDist[p]) {
+                pixelBestDist[p] = normDist;
+                pixelRuleIndex[p] = idx;
+              }
+            }
           }
         }
       } else {
         const th = targetHsv.h;
+        const ts = targetHsv.s;
         const tv = targetHsv.v;
+        const maxH = Math.max(7, rule.tolerance * 0.35);
+        const maxS = Math.max(15, rule.tolerance * 0.9);
+        const maxV = Math.max(15, rule.tolerance * 0.75);
+
+        const invH = 1 / maxH;
+        const invS = 1 / maxS;
+        const invV = 1 / maxV;
+
         for (let p = 0; p < totalPixels; p++) {
-          if (s[p] > 15 && v[p] > 10) {
+          if (s[p] > 12 && v[p] > 8) {
             let dh = Math.abs(h[p] - th);
             if (dh > 180) dh = 360 - dh;
-            if (dh <= maxHueDiff && Math.abs(v[p] - tv) <= 55) {
-              mask[p] = 1;
+            if (dh <= maxH) {
+              const ds = Math.abs(s[p] - ts);
+              if (ds <= maxS) {
+                const dv = Math.abs(v[p] - tv);
+                if (dv <= maxV) {
+                  const nh = dh * invH;
+                  const ns = ds * invS;
+                  const nv = dv * invV;
+                  const normDist = nh * nh + ns * ns + nv * nv;
+                  if (normDist < pixelBestDist[p]) {
+                    pixelBestDist[p] = normDist;
+                    pixelRuleIndex[p] = idx;
+                  }
+                }
+              }
             }
           }
         }
       }
-      return mask;
     });
 
     rules.forEach((rule, idx) => {
-      const mask = ruleMasks[idx];
-
       if (rule.borderEnabled) {
+        const mask = new Uint8Array(totalPixels);
+        for (let p = 0; p < totalPixels; p++) {
+          if (pixelRuleIndex[p] === idx) mask[p] = 1;
+        }
         const radius = Math.max(1, Math.round(rule.borderWidth * scaleFactor));
         const dilated = this.dilateMask(mask, width, height, radius);
         const bShade = rule.borderShade;
         for (let p = 0; p < totalPixels; p++) {
-          if (dilated[p] && !mask[p]) outGray[p] = bShade;
+          if (dilated[p] && pixelRuleIndex[p] !== idx) {
+            outGray[p] = bShade;
+          }
         }
       }
 
       if (rule.pattern === "solid") {
         const fShade = rule.fillShade;
         for (let p = 0; p < totalPixels; p++) {
-          if (mask[p]) outGray[p] = fShade;
+          if (pixelRuleIndex[p] === idx) {
+            outGray[p] = fShade;
+          }
         }
       } else {
         const spacing = Math.max(3, Math.round(rule.patternSpacing * scaleFactor));
@@ -333,7 +385,7 @@ const ImageEngine = {
           const rowOffset = y * width;
           for (let x = 0; x < width; x++) {
             const p = rowOffset + x;
-            if (mask[p]) {
+            if (pixelRuleIndex[p] === idx) {
               outGray[p] = this.getPatternPixelShade(rule, x, y, spacing, stroke, dotSize);
             }
           }
@@ -962,7 +1014,7 @@ const AppController = {
         let dh = Math.abs(cHsv.h - eHsv.h);
         if (dh > 180) dh = 360 - dh;
         const rgbDist = Math.hypot(cr - er, cg - eg, cb - eb);
-        return rgbDist < 42 || (dh < 18 && Math.abs(cHsv.v - eHsv.v) < 25);
+        return rgbDist < 28 || (dh < 12 && Math.abs(cHsv.v - eHsv.v) < 18 && Math.abs(cHsv.s - eHsv.s) < 20);
       });
 
       if (!alreadyExists) {
