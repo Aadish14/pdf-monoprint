@@ -1056,33 +1056,8 @@ canvas {
   background: var(--color-surface);
 }
 
-.app-footer .footer-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-}
-
 .app-footer p {
   margin: 0;
-}
-
-.app-footer .footer-badges {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.app-footer .footer-badges a {
-  display: inline-block;
-  line-height: 0;
-  transition: transform var(--transition-fast), filter var(--transition-fast);
-}
-
-.app-footer .footer-badges a:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.05);
 }
 
 @media (max-width: 960px) {
