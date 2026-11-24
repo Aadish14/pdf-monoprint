@@ -15,7 +15,12 @@
 
 <br />
 
-<img src="assets/hero-demo.png" alt="PDF MonoPrint Dual Preview" width="850" />
+### 🔍 See the Difference
+
+| 1. Original Color Document | 2. Standard B&W Printout | 3. With PDF MonoPrint |
+| :---: | :---: | :---: |
+| <img src="assets/original.jpg" alt="Original Color Document" width="100%" /> | <img src="assets/without_pdfmonoprint.jpg" alt="Without PDF MonoPrint - All colors collapse into identical gray" width="100%" /> | <img src="assets/with_pdfmonoprint.jpg" alt="With PDF MonoPrint - Distinct tactile patterns and outlines" width="100%" /> |
+| 🌈 **Full Color Document**<br>Looks great on screens, but unreadable when printed. | ❌ **Without MonoPrint**<br>All colors collapse into the **exact same flat gray**. | ✅ **With PDF MonoPrint**<br>Every color maps to a **distinct tactile pattern & outline**! |
 
 </div>
 
@@ -35,7 +40,7 @@ When you print color-coded documents on a monochrome laser printer or run them t
 
 PDF MonoPrint replaces flat color fills with **tactile, high-contrast visual textures** so every single color remains instantly distinguishable, even on low-end black & white office printers or photocopiers:
 
-| Color In Original Document | Standard B&W Printout | With PDF MonoPrint |
+| Color In Original Document | Standard B&W Printout (Without MonoPrint) | With PDF MonoPrint |
 | :--- | :--- | :--- |
 | **Red (Series A)** | Flat gray `#666666` | **Dense Diagonal Stripes + Dark Border** |
 | **Blue (Series B)** | Flat gray `#666666` *(Identical!)* | **Crosshatch Grid + Crisp Border** |
@@ -44,6 +49,26 @@ PDF MonoPrint replaces flat color fills with **tactile, high-contrast visual tex
 | **Document Legend** | 4 identical gray squares | **Explanatory Key with Matching Textures** |
 | **Dark Slide Backgrounds** | Soaked in black toner | **Inverted to pure white with crisp black text** |
 | **Document Privacy** | Uploaded to cloud converters | **100% private in-browser execution (Air-Gapped)** |
+
+---
+
+## 📸 Visual Comparison in Detail
+
+<div align="center">
+
+### ❌ Without PDF MonoPrint (Standard Monochrome Print)
+*All color segments, lines, and legend swatches blend into the exact same shade of gray — data meaning is completely lost.*
+
+<img src="assets/without_pdfmonoprint.jpg" alt="Without PDF MonoPrint - Unreadable Gray Mush" width="920" />
+
+<br /><br />
+
+### ✅ With PDF MonoPrint
+*Every color is converted into an instantly distinguishable texture (stripes, crosshatch, stipple halftone dots, and contrast outlines) with an explanatory legend key.*
+
+<img src="assets/with_pdfmonoprint.jpg" alt="With PDF MonoPrint - Distinguishable Patterns and Textures" width="920" />
+
+</div>
 
 ---
 
