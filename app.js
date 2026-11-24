@@ -20,6 +20,9 @@ const CONFIG = Object.freeze({
 
 const PALETTES = Object.freeze({
   basicColors: [
+    { name: "Terracotta", hex: "#a53f2b" },
+    { name: "Periwinkle", hex: "#c6d4ff" },
+    { name: "Light Green", hex: "#99f7ab" },
     { name: "Red", hex: "#d92626" },
     { name: "Blue", hex: "#1d4ed8" },
     { name: "Green", hex: "#16a34a" },
