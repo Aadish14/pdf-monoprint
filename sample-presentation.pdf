@@ -1,0 +1,171 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 960 540] /Contents 4 0 R /Resources << /Font << /F1 7 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1457 >>
+stream
+0 0 0 rg
+0 0 960 540 re f
+0.06 0.09 0.16 rg
+0 0 960 540 re f
+
+BT
+/F1 28 Tf
+1 1 1 rg
+50 480 Td
+(CS 401: Deep Learning Systems - Lecture 7) Tj
+ET
+
+BT
+/F1 16 Tf
+0.58 0.65 0.75 rg
+50 450 Td
+(Comparison of Model Training Loss & Energy Consumption) Tj
+ET
+
+0.2 0.25 0.35 RG
+1.5 w
+50 435 m 910 435 l S
+
+0.3 0.35 0.45 RG
+1 w
+120 120 m 860 120 l S
+120 120 m 120 400 l S
+
+BT
+/F1 12 Tf
+0.7 0.75 0.85 rg
+60 115 Td (0%) Tj
+0 70 Td (25%) Tj
+0 70 Td (50%) Tj
+0 70 Td (75%) Tj
+0 70 Td (100%) Tj
+ET
+
+0.2 0.25 0.35 RG
+[4 4] 0 d
+120 190 m 860 190 l S
+120 260 m 860 260 l S
+120 330 m 860 330 l S
+120 400 m 860 400 l S
+[] 0 d
+
+0.85 0.15 0.15 rg
+170 120 80 180 re f
+BT /F1 14 Tf 1 1 1 rg 180 310 Td (45%) Tj ET
+BT /F1 13 Tf 0.85 0.85 0.85 rg 170 95 Td (Baseline) Tj ET
+
+0.11 0.4 0.85 rg
+330 120 80 230 re f
+BT /F1 14 Tf 1 1 1 rg 345 360 Td (62%) Tj ET
+BT /F1 13 Tf 0.85 0.85 0.85 rg 340 95 Td (ResNet) Tj ET
+
+0.09 0.64 0.29 rg
+490 120 80 270 re f
+BT /F1 14 Tf 1 1 1 rg 505 400 Td (78%) Tj ET
+BT /F1 13 Tf 0.85 0.85 0.85 rg 485 95 Td (ConvNeXt) Tj ET
+
+0.92 0.35 0.05 rg
+650 120 80 250 re f
+BT /F1 14 Tf 1 1 1 rg 665 380 Td (72%) Tj ET
+BT /F1 13 Tf 0.85 0.85 0.85 rg 650 95 Td (Vision-Tr) Tj ET
+
+0.13 0.17 0.23 rg
+650 450 240 60 re f
+0.3 0.35 0.45 RG 1 w 650 450 240 60 re S
+
+0.85 0.15 0.15 rg 665 488 15 12 re f
+BT /F1 11 Tf 0.9 0.9 0.9 rg 690 490 Td (Heavy CPU Baseline) Tj ET
+
+0.09 0.64 0.29 rg 665 463 15 12 re f
+BT /F1 11 Tf 0.9 0.9 0.9 rg 690 465 Td (Optimized Pipeline) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 960 540] /Contents 6 0 R /Resources << /Font << /F1 7 0 R >> >> >>
+endobj
+6 0 obj
+<< /Length 1197 >>
+stream
+0.96 0.95 0.92 rg
+0 0 960 540 re f
+
+BT
+/F1 26 Tf
+0.1 0.15 0.2 rg
+50 480 Td
+(System Architecture & Data Pipeline) Tj
+ET
+
+BT
+/F1 15 Tf
+0.4 0.45 0.5 rg
+50 450 Td
+(Demonstrating background whitening and multi-tone hatch patterns) Tj
+ET
+
+0.8 0.8 0.8 RG 1.5 w
+50 435 m 910 435 l S
+
+0.08 0.55 0.75 rg
+100 240 160 90 re f
+0.05 0.35 0.55 RG 2 w 100 240 160 90 re S
+BT /F1 15 Tf 1 1 1 rg 135 290 Td (Raw Input) Tj 140 265 Td (Telemetry) Tj ET
+
+0.58 0.2 0.92 rg
+390 240 180 90 re f
+0.4 0.1 0.7 RG 2 w 390 240 180 90 re S
+BT /F1 15 Tf 1 1 1 rg 410 290 Td (Neural Network) Tj 430 265 Td (Inference) Tj ET
+
+0.92 0.7 0.03 rg
+700 240 160 90 re f
+0.7 0.5 0.01 RG 2 w 700 240 160 90 re S
+BT /F1 15 Tf 0.1 0.1 0.1 rg 730 290 Td (Diagnostic) Tj 745 265 Td (Alerts) Tj ET
+
+0.3 0.35 0.4 RG 3 w
+260 285 m 385 285 l S
+375 295 m 390 285 l 375 275 l S
+
+570 285 m 695 285 l S
+685 295 m 700 285 l 685 275 l S
+
+0.85 0.15 0.15 rg
+100 80 760 100 re f
+0.65 0.1 0.1 RG 2 w 100 80 760 100 re S
+
+BT
+/F1 16 Tf
+1 1 1 rg
+130 140 Td
+(Critical Alert: Printing in Standard B&W destroys colored data points!) Tj
+/F1 13 Tf
+130 105 Td
+(Use PDF MonoPrint to whiten this cream paper and map Cyan, Purple, Yellow and Red to hatch styles.) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000247 00000 n 
+0000001756 00000 n 
+0000001882 00000 n 
+0000003131 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+3201
+%%EOF
