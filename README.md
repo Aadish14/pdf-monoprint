@@ -2,7 +2,7 @@
 
 # 🖨️ PDF MonoPrint
 
-### Make Colors Distinguishable in Black & White PDFs
+### Make Colors Distinguishable in Black & White PDFs when you print with your laser or black & white printer
 
 **Never lose chart data, graph legends, or diagram meaning when printing in monochrome. PDF MonoPrint maps identical-looking gray tones into distinct geometric hatch patterns, textures, and outlines — 100% locally in your browser.**
 
