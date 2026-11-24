@@ -8,7 +8,11 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <link rel="stylesheet" href="style.css?v=2.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=2.1" />
   <!-- Local air-gapped libraries -->
   <script src="vendor/pdf.min.js"></script>
   <script src="vendor/jspdf.umd.min.js"></script>
@@ -30,14 +34,48 @@
 
   <header class="app-header">
     <div class="header-main">
-      <div class="header-titles">
-        <h1>PDF MonoPrint</h1>
-        <p class="privacy-note">
-          Make Colors Distinguishable in Black &amp; White PDFs when you print with your laser or black &amp; white printer &bull; 100% in-browser
-        </p>
+      <div class="header-brand-block">
+        <div class="brand-logo-container" aria-hidden="true">
+          <svg class="brand-printer-svg" viewBox="0 0 32 32" width="34" height="34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="url(#headerLogoGrad)" />
+            <path d="M10 6h12v5H10z" fill="#e0e7ff" />
+            <rect x="6" y="10" width="20" height="11" rx="2.5" fill="#ffffff" />
+            <circle cx="22.5" cy="13.5" r="1.3" fill="#10b981" />
+            <rect x="9" y="16" width="14" height="2" rx="1" fill="#94a3b8" />
+            <rect x="9.5" y="17" width="13" height="10" rx="1" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.75" />
+            <line x1="11.5" y1="20" x2="20.5" y2="20" stroke="#0f172a" stroke-width="1.25" stroke-linecap="round" />
+            <line x1="11.5" y1="22.5" x2="18" y2="22.5" stroke="#2563eb" stroke-width="1.25" stroke-linecap="round" />
+            <line x1="11.5" y1="25" x2="19.5" y2="25" stroke="#0f172a" stroke-width="1.25" stroke-linecap="round" />
+            <defs>
+              <linearGradient id="headerLogoGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#2563eb" />
+                <stop offset="1" stop-color="#4f46e5" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="header-titles">
+          <div class="title-row">
+            <h1>PDF <span class="brand-highlight">MonoPrint</span></h1>
+            <span class="version-tag">v2.0</span>
+          </div>
+          <p class="tagline">
+            Make Colors Distinguishable in Black &amp; White Prints &bull; 100% In-Browser &bull; Zero Server Uploads
+          </p>
+        </div>
       </div>
+
       <div class="header-meta">
-        <span class="badge-airgapped">Air-Gapped Offline</span>
+        <div class="status-indicator" title="100% private in-browser execution: no files are ever uploaded">
+          <span class="status-pulse-dot"></span>
+          <span>Air-Gapped Offline</span>
+        </div>
+        <a href="https://github.com/Aadish14/pdf-monoprint" target="_blank" rel="noopener noreferrer" class="btn-github-star" title="Star PDF MonoPrint on GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span>Star on GitHub</span>
+        </a>
       </div>
     </div>
   </header>
@@ -254,6 +292,6 @@
     </p>
   </footer>
 
-  <script src="app.js?v=2.0"></script>
+  <script src="app.js?v=2.1"></script>
 </body>
 </html>
