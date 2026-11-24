@@ -40,7 +40,7 @@
   </header>
 
   <main class="workspace">
-    <!-- Left Sidebar: Controls & Settings -->
+    <!-- Left Sidebar: PDF Input, Toner Saver & Export -->
     <aside class="sidebar">
       <!-- Section 1: File Input -->
       <section class="panel">
@@ -92,37 +92,9 @@
         </div>
       </section>
 
-      <!-- Section 3: Color Rules -->
+      <!-- Section 3: Export -->
       <section class="panel">
-        <div class="panel-header">
-          <h2 class="panel-title">3. Color &amp; Texture Mapping</h2>
-          <div class="header-actions">
-            <button id="autoDetectPageBtn" class="btn-sm" disabled title="Detect visible ink colors on current page">Auto-Detect</button>
-            <button id="clearRulesBtn" class="btn-sm" disabled title="Clear all color rules">Clear</button>
-          </div>
-        </div>
-
-        <div class="mode-toggle" role="tablist" aria-label="Color rules complexity">
-          <button id="basicModeBtn" class="mode-btn active" type="button">Basic</button>
-          <button id="advancedModeBtn" class="mode-btn" type="button">Advanced</button>
-        </div>
-
-        <div id="basicColorsBox" class="basic-colors-box">
-          <div class="basic-colors-label">Quick Add Palette:</div>
-          <div id="basicColorChips" class="basic-color-chips"></div>
-        </div>
-
-        <p class="hint">
-          Pick a color above, click ink on the <strong>Original PDF</strong>, or click <strong>Auto-Detect</strong>.
-        </p>
-
-        <div id="rulesContainer" class="rules-list"></div>
-        <button id="addManualRuleBtn" class="secondary-btn" disabled>+ Add Custom Color Rule</button>
-      </section>
-
-      <!-- Section 4: Export -->
-      <section class="panel">
-        <h2 class="panel-title">4. Export</h2>
+        <h2 class="panel-title">3. Export &amp; Download</h2>
 
         <label class="inline-field">
           <span>Export DPI:</span>
@@ -163,8 +135,9 @@
       </section>
     </aside>
 
-    <!-- Right Workspace: Previews & Navigation -->
+    <!-- Right Workspace: Previews & Color Rules -->
     <section class="preview-column">
+      <!-- Toolbar -->
       <div class="preview-toolbar hidden" id="pageNav">
         <div class="toolbar-group">
           <button id="prevPage" type="button" class="btn-nav">
@@ -183,13 +156,14 @@
           <button id="zoomOutBtn" type="button" aria-label="Zoom out" class="btn-icon">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
-          <button id="zoomResetBtn" type="button" title="Reset to fit width">100%</button>
+          <button id="zoomResetBtn" type="button" title="Reset to fit container">100%</button>
           <button id="zoomInBtn" type="button" aria-label="Zoom in" class="btn-icon">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
         </div>
       </div>
 
+      <!-- Previews: Original & Monochrome -->
       <div class="preview-area">
         <div class="canvas-card">
           <header class="canvas-header">
@@ -215,6 +189,35 @@
           </div>
         </div>
       </div>
+
+      <!-- Color & Texture Mapping (Moved here below previews!) -->
+      <section class="panel rules-panel">
+        <div class="panel-header rules-header-top">
+          <div class="rules-header-left">
+            <h2 class="panel-title">Color &amp; Texture Mapping</h2>
+            <div class="mode-toggle" role="tablist" aria-label="Color rules complexity">
+              <button id="basicModeBtn" class="mode-btn active" type="button">Basic</button>
+              <button id="advancedModeBtn" class="mode-btn" type="button">Advanced</button>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button id="autoDetectPageBtn" class="btn-sm" disabled title="Detect visible ink colors on current page">Auto-Detect</button>
+            <button id="clearRulesBtn" class="btn-sm" disabled title="Clear all color rules">Clear</button>
+          </div>
+        </div>
+
+        <div id="basicColorsBox" class="basic-colors-box">
+          <div class="basic-colors-label">Quick Add Palette:</div>
+          <div id="basicColorChips" class="basic-color-chips"></div>
+        </div>
+
+        <p class="hint">
+          Pick a color above, click ink on the <strong>Original PDF</strong>, or click <strong>Auto-Detect</strong> to assign distinguishable hatch patterns and outlines.
+        </p>
+
+        <div id="rulesContainer" class="rules-list rules-grid"></div>
+        <button id="addManualRuleBtn" class="secondary-btn" disabled>+ Add Custom Color Rule</button>
+      </section>
     </section>
   </main>
 
@@ -224,6 +227,6 @@
     </p>
   </footer>
 
-  <script src="app.js?v=1.1"></script>
+  <script src="app.js?v=1.2"></script>
 </body>
 </html>

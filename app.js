@@ -749,6 +749,10 @@ const AppController = {
     });
 
     this.dom.exportBtn.addEventListener("click", () => this.handleExport());
+
+    window.addEventListener("resize", () => {
+      if (state.pdfDoc) this.updateZoomUI();
+    });
   },
 
   bindDragDrop() {
@@ -864,18 +868,21 @@ const AppController = {
   },
 
   async renderPreviewPage(pageNum) {
-    this.dom.pageIndicator.textContent = `Page ${pageNum} / ${state.pdfDoc.numPages}`;
-    this.dom.prevPage.disabled = pageNum <= 1;
-    this.dom.nextPage.disabled = pageNum >= state.pdfDoc.numPages;
-
     this.showPreviewLoader(true);
     const page = await state.pdfDoc.getPage(pageNum);
-    const viewport = page.getViewport({ scale: CONFIG.previewScale });
+    const rotation = page.rotate || 0;
+    const viewport = page.getViewport({ scale: CONFIG.previewScale, rotation });
 
     this.dom.origCanvas.width = Math.floor(viewport.width);
     this.dom.origCanvas.height = Math.floor(viewport.height);
     this.dom.outCanvas.width = this.dom.origCanvas.width;
     this.dom.outCanvas.height = this.dom.origCanvas.height;
+
+    const isLandscape = viewport.width > viewport.height;
+    const orientLabel = isLandscape ? "Landscape" : "Portrait";
+    this.dom.pageIndicator.textContent = `Page ${pageNum} / ${state.pdfDoc.numPages} (${orientLabel})`;
+    this.dom.prevPage.disabled = pageNum <= 1;
+    this.dom.nextPage.disabled = pageNum >= state.pdfDoc.numPages;
 
     this.updateZoomUI();
     this.dom.origWrapper.scrollTop = 0;
@@ -925,9 +932,36 @@ const AppController = {
   },
 
   updateZoomUI() {
+    if (!this.dom.origCanvas.width || !this.dom.origCanvas.height) return;
+
+    const wrapperWidth = this.dom.origWrapper.clientWidth || 400;
+    const wrapperHeight = this.dom.origWrapper.clientHeight || 350;
+
+    const pad = 24;
+    const availW = Math.max(100, wrapperWidth - pad);
+    const availH = Math.max(100, wrapperHeight - pad);
+
+    const canvasAspect = this.dom.origCanvas.width / this.dom.origCanvas.height;
+    const wrapperAspect = availW / availH;
+
+    let baseW, baseH;
+    if (canvasAspect > wrapperAspect) {
+      baseW = availW;
+      baseH = availW / canvasAspect;
+    } else {
+      baseH = availH;
+      baseW = availH * canvasAspect;
+    }
+
+    const targetW = Math.round(baseW * state.zoomLevel);
+    const targetH = Math.round(baseH * state.zoomLevel);
+
+    this.dom.origCanvas.style.width = `${targetW}px`;
+    this.dom.origCanvas.style.height = `${targetH}px`;
+    this.dom.outCanvas.style.width = `${targetW}px`;
+    this.dom.outCanvas.style.height = `${targetH}px`;
+
     const pct = `${Math.round(state.zoomLevel * 100)}%`;
-    this.dom.origCanvas.style.width = pct;
-    this.dom.outCanvas.style.width = pct;
     this.dom.zoomResetBtn.textContent = pct;
     this.dom.zoomOutBtn.disabled = state.zoomLevel <= CONFIG.minZoom;
     this.dom.zoomInBtn.disabled = state.zoomLevel >= CONFIG.maxZoom;
@@ -1380,8 +1414,9 @@ const AppController = {
         await new Promise((r) => setTimeout(r, 20));
 
         const firstPage = await state.pdfDoc.getPage(selectedPages[0]);
-        const ptVp = firstPage.getViewport({ scale: 1.0 });
-        const rVp = firstPage.getViewport({ scale: renderScale });
+        const rotation = firstPage.rotate || 0;
+        const ptVp = firstPage.getViewport({ scale: 1.0, rotation });
+        const rVp = firstPage.getViewport({ scale: renderScale, rotation });
 
         const legendCanvas = PdfExportEngine.createLegendCoverPage(
           Math.floor(rVp.width),
@@ -1410,8 +1445,9 @@ const AppController = {
         await new Promise((r) => setTimeout(r, 20));
 
         const page = await state.pdfDoc.getPage(pageNum);
-        const ptViewport = page.getViewport({ scale: 1.0 });
-        const renderViewport = page.getViewport({ scale: renderScale });
+        const rotation = page.rotate || 0;
+        const ptViewport = page.getViewport({ scale: 1.0, rotation });
+        const renderViewport = page.getViewport({ scale: renderScale, rotation });
 
         workCanvas.width = Math.floor(renderViewport.width);
         workCanvas.height = Math.floor(renderViewport.height);
