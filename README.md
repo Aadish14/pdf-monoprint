@@ -11,6 +11,10 @@
 [![Air-Gapped](https://img.shields.io/badge/Offline-Air--Gapped-6366f1?style=for-the-badge)](https://aadish14.github.io/pdf-monoprint/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-gray.svg?style=for-the-badge)](LICENSE)
 
+<br />
+
+<a href="https://listmaro.com" target="_blank" rel="noopener"><img src="https://listmaro.com/badge.svg" alt="Listed on Listmaro" width="148" height="40" /></a>
+
 ### [👉 Launch PDF MonoPrint Web App (No Installation Needed)](https://aadish14.github.io/pdf-monoprint/)
 
 <br />
@@ -151,5 +155,7 @@ This software is available under the terms of the MIT License.
 ---
 
 <div align="center">
+  <a href="https://listmaro.com" target="_blank" rel="noopener"><img src="https://listmaro.com/badge.svg" alt="Listed on Listmaro" width="148" height="40" /></a>
+  <br /><br />
   <sub>Developed by <a href="https://github.com/Aadish14">Aadish</a> &bull; If this project helped you make your monochrome prints readable, please consider giving it a ⭐!</sub>
 </div>
