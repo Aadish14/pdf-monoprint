@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laser-Printer Friendly PDF Converter</title>
+  <meta name="description" content="Client-side tool to convert PDF slides and diagrams into high-contrast, laser-printer friendly monochrome documents." />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Local air-gapped libraries -->
+  <script src="vendor/pdf.min.js"></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <!-- Full-window drag-and-drop overlay -->
+  <div id="globalDropOverlay" class="global-drop-overlay" aria-hidden="true">
+    <div class="global-drop-box">
+      <svg class="drop-icon-svg" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="12" y1="18" x2="12" y2="12"></line>
+        <line x1="9" y1="15" x2="15" y2="15"></line>
+      </svg>
+      <p>Drop PDF anywhere to open</p>
+      <span>100% private &bull; Processed locally in your browser</span>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="header-main">
+      <div class="header-titles">
+        <h1>Laser-Printer Friendly PDF Converter</h1>
+        <p class="privacy-note">
+          Zero server transmission &bull; Document processing executes entirely in your browser
+        </p>
+      </div>
+      <div class="header-meta">
+        <span class="badge-airgapped">Air-Gapped Offline</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <!-- Left Sidebar: Controls & Settings -->
+    <aside class="sidebar">
+      <!-- Section 1: File Input -->
+      <section class="panel">
+        <h2 class="panel-title">1. Select PDF</h2>
+        <label id="dropZone" class="drop-zone" for="pdfUpload">
+          <input type="file" id="pdfUpload" accept="application/pdf" class="sr-only" />
+          <span class="drop-zone-title">Drag &amp; drop a PDF here</span>
+          <span class="drop-zone-sub">or click to browse local files</span>
+          <span id="fileNameDisplay" class="file-name-pill hidden"></span>
+        </label>
+        <p class="hint drop-hint">
+          Processed offline in memory. No network connection required.
+        </p>
+      </section>
+
+      <!-- Section 2: Toner Conservation -->
+      <section class="panel">
+        <h2 class="panel-title">2. Toner Saver</h2>
+
+        <div class="toner-option">
+          <label class="checkbox-field">
+            <input type="checkbox" id="darkModeInvertCheckbox" />
+            <span>Dark-Mode Slide Inversion</span>
+          </label>
+          <p class="sub-hint">
+            Inverts dark backgrounds to white while maintaining original foreground color mappings.
+          </p>
+        </div>
+
+        <div class="toner-option">
+          <label class="checkbox-field">
+            <input type="checkbox" id="bgWhitenCheckbox" />
+            <span>Background Whitening</span>
+          </label>
+          <p class="sub-hint">
+            Snaps light-gray, cream, or scanned background artifacts to pure white.
+          </p>
+
+          <div id="bgWhitenControls" class="sub-controls hidden">
+            <label class="control-row">
+              <span>Whitening Cutoff (<strong id="bgWhitenVal">215</strong>)</span>
+              <input type="range" id="bgWhitenSlider" min="140" max="250" value="215" />
+            </label>
+            <div class="slider-scale">
+              <span>Aggressive (140)</span>
+              <span>Subtle (250)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Color Rules -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">3. Color Rules</h2>
+          <div class="header-actions">
+            <button id="autoDetectPageBtn" class="btn-sm" disabled title="Detect visible ink colors on current page">Auto-Detect</button>
+            <button id="clearRulesBtn" class="btn-sm" disabled title="Clear all color rules">Clear</button>
+          </div>
+        </div>
+
+        <div class="mode-toggle" role="tablist" aria-label="Color rules complexity">
+          <button id="basicModeBtn" class="mode-btn active" type="button">Basic</button>
+          <button id="advancedModeBtn" class="mode-btn" type="button">Advanced</button>
+        </div>
+
+        <div id="basicColorsBox" class="basic-colors-box">
+          <div class="basic-colors-label">Quick Add Palette:</div>
+          <div id="basicColorChips" class="basic-color-chips"></div>
+        </div>
+
+        <p class="hint">
+          Pick a color above, click ink on the <strong>Original PDF</strong>, or click <strong>Auto-Detect</strong>.
+        </p>
+
+        <div id="rulesContainer" class="rules-list"></div>
+        <button id="addManualRuleBtn" class="secondary-btn" disabled>+ Add Custom Color Rule</button>
+      </section>
+
+      <!-- Section 4: Export -->
+      <section class="panel">
+        <h2 class="panel-title">4. Export</h2>
+
+        <label class="inline-field">
+          <span>Export DPI:</span>
+          <select id="dpiSelect">
+            <option value="150">150 DPI (Fast / Compact)</option>
+            <option value="200" selected>200 DPI (Balanced Print)</option>
+            <option value="300">300 DPI (High Resolution)</option>
+          </select>
+        </label>
+
+        <label class="stacked-field">
+          <span>Page Range <span class="muted-label">(empty = all pages)</span></span>
+          <input
+            type="text"
+            id="pageRangeInput"
+            placeholder="e.g. 1-5, 8, 12-15"
+            autocomplete="off"
+          />
+        </label>
+
+        <div class="legend-box">
+          <label class="checkbox-field">
+            <input type="checkbox" id="includeLegendCheckbox" checked />
+            <span>Include Monochrome Legend</span>
+          </label>
+
+          <label id="legendPlacementRow" class="inline-field legend-placement-row">
+            <span>Placement:</span>
+            <select id="legendPlacementSelect">
+              <option value="banner" selected>Top Banner on First Page</option>
+              <option value="page">Standalone Cover Page</option>
+            </select>
+          </label>
+        </div>
+
+        <button id="exportBtn" class="primary-btn" disabled>Download Monochrome PDF</button>
+        <p id="statusText" class="status-message" aria-live="polite"></p>
+      </section>
+    </aside>
+
+    <!-- Right Workspace: Previews & Navigation -->
+    <section class="preview-column">
+      <div class="preview-toolbar hidden" id="pageNav">
+        <div class="toolbar-group">
+          <button id="prevPage" type="button" class="btn-nav">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span>Prev</span>
+          </button>
+          <span id="pageIndicator" class="page-indicator">Page 1 / 1</span>
+          <button id="nextPage" type="button" class="btn-nav">
+            <span>Next</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+
+        <div class="toolbar-group zoom-controls" title="Zoom buttons or Ctrl + Scroll Wheel over either preview">
+          <span class="toolbar-label">Zoom:</span>
+          <button id="zoomOutBtn" type="button" aria-label="Zoom out" class="btn-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+          <button id="zoomResetBtn" type="button" title="Reset to fit width">100%</button>
+          <button id="zoomInBtn" type="button" aria-label="Zoom in" class="btn-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="preview-area">
+        <div class="canvas-card">
+          <header class="canvas-header">
+            <h3>Original PDF</h3>
+            <span class="badge">Click ink to pick color</span>
+          </header>
+          <div id="origWrapper" class="canvas-wrapper">
+            <canvas id="origCanvas"></canvas>
+          </div>
+        </div>
+
+        <div class="canvas-card">
+          <header class="canvas-header">
+            <h3>Monochrome Preview</h3>
+            <span class="badge">Live output</span>
+          </header>
+          <div id="previewLoader" class="preview-loader hidden">
+            <div class="spinner"></div>
+            <span>Rendering preview...</span>
+          </div>
+          <div id="outWrapper" class="canvas-wrapper">
+            <canvas id="outCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>
+      Laser-Printer Friendly PDF Converter &bull; Developed by Aadish &bull; Free &amp; Open Source under MIT License
+    </p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
