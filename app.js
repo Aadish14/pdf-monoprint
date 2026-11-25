@@ -650,8 +650,11 @@ const AppController = {
     this.dom = {
       pdfUpload: document.getElementById("pdfUpload"),
       dropZone: document.getElementById("dropZone"),
+      loadSampleBtn: document.getElementById("loadSampleBtn"),
       fileNameDisplay: document.getElementById("fileNameDisplay"),
       globalDropOverlay: document.getElementById("globalDropOverlay"),
+      starToast: document.getElementById("starToast"),
+      dismissStarToastBtn: document.getElementById("dismissStarToastBtn"),
       darkModeInvertCheckbox: document.getElementById("darkModeInvertCheckbox"),
       bgWhitenCheckbox: document.getElementById("bgWhitenCheckbox"),
       bgWhitenControls: document.getElementById("bgWhitenControls"),
@@ -702,6 +705,14 @@ const AppController = {
       if (file) this.loadPdfFile(file);
       this.dom.pdfUpload.value = "";
     });
+
+    if (this.dom.loadSampleBtn) {
+      this.dom.loadSampleBtn.addEventListener("click", () => this.loadSamplePdf());
+    }
+
+    if (this.dom.dismissStarToastBtn) {
+      this.dom.dismissStarToastBtn.addEventListener("click", () => this.hideStarToast(true));
+    }
 
     this.bindDragDrop();
 
@@ -870,32 +881,83 @@ const AppController = {
       return;
     }
 
-    state.uploadedFileName = file.name;
-    this.dom.fileNameDisplay.textContent = file.name;
-    this.dom.fileNameDisplay.classList.remove("hidden");
-    this.setStatus("Parsing PDF locally...");
-
     try {
       const arrayBuffer = await file.arrayBuffer();
-      state.pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      state.currentPage = 1;
-      state.zoomLevel = 1.0;
-
-      this.dom.pageNav.classList.remove("hidden");
-      this.dom.autoDetectPageBtn.disabled = false;
-      this.dom.clearRulesBtn.disabled = false;
-      this.dom.addManualRuleBtn.disabled = false;
-      this.dom.exportBtn.disabled = false;
-      this.dom.pageRangeInput.placeholder = `e.g. 1-${Math.min(5, state.pdfDoc.numPages)} (1-${state.pdfDoc.numPages} available)`;
-
-      this.renderPaletteChips();
-      this.updateZoomUI();
-      this.renderRulesUI();
-      await this.renderPreviewPage(state.currentPage);
+      await this.loadPdfArrayBuffer(arrayBuffer, file.name);
       this.setStatus("Ready. Select colors, click ink on the Original canvas, or run Auto-Detect.");
     } catch (err) {
       console.error("PDF Parsing Failure:", err);
       this.setStatus(`Failed to read PDF: ${err.message}`, true);
+    }
+  },
+
+  async loadSamplePdf() {
+    if (this.dom.loadSampleBtn) this.dom.loadSampleBtn.disabled = true;
+    this.setStatus("Loading sample chart PDF...");
+    try {
+      const response = await fetch("sample-presentation.pdf");
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      state.rules = [];
+      state.toner.darkModeInvert = true;
+      if (this.dom.darkModeInvertCheckbox) {
+        this.dom.darkModeInvertCheckbox.checked = true;
+      }
+      await this.loadPdfArrayBuffer(arrayBuffer, "sample-presentation.pdf");
+      this.autoDetectCurrentPage();
+      this.setStatus("Loaded sample PDF with Dark-Mode Inversion & auto-detected chart colors!");
+    } catch (err) {
+      console.error("Sample PDF Load Failure:", err);
+      this.setStatus("Sample auto-load requires HTTP/GitHub Pages. Please drag & drop a PDF file directly.", true);
+    } finally {
+      if (this.dom.loadSampleBtn) this.dom.loadSampleBtn.disabled = false;
+    }
+  },
+
+  async loadPdfArrayBuffer(arrayBuffer, fileName) {
+    state.uploadedFileName = fileName;
+    this.dom.fileNameDisplay.textContent = fileName;
+    this.dom.fileNameDisplay.classList.remove("hidden");
+    this.setStatus("Parsing PDF locally...");
+
+    state.pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    state.currentPage = 1;
+    state.zoomLevel = 1.0;
+
+    this.dom.pageNav.classList.remove("hidden");
+    this.dom.autoDetectPageBtn.disabled = false;
+    this.dom.clearRulesBtn.disabled = false;
+    this.dom.addManualRuleBtn.disabled = false;
+    this.dom.exportBtn.disabled = false;
+    this.dom.pageRangeInput.placeholder = `e.g. 1-${Math.min(5, state.pdfDoc.numPages)} (1-${state.pdfDoc.numPages} available)`;
+
+    this.renderPaletteChips();
+    this.updateZoomUI();
+    this.renderRulesUI();
+    await this.renderPreviewPage(state.currentPage);
+  },
+
+  showStarToast() {
+    if (!this.dom.starToast) return;
+    try {
+      if (sessionStorage.getItem("pdfMonoPrint_starToastDismissed") === "1") return;
+    } catch (_) {
+      // Ignore storage access errors in restricted frames
+    }
+    this.dom.starToast.classList.remove("hidden");
+  },
+
+  hideStarToast(remember = false) {
+    if (!this.dom.starToast) return;
+    this.dom.starToast.classList.add("hidden");
+    if (remember) {
+      try {
+        sessionStorage.setItem("pdfMonoPrint_starToastDismissed", "1");
+      } catch (_) {
+        // Ignore storage access errors
+      }
     }
   },
 
@@ -1100,11 +1162,14 @@ const AppController = {
     const buckets = Array.from({ length: NUM_HUE * 2 }, () => ({ count: 0, r: 0, g: 0, b: 0 }));
     let sampled = 0;
 
+    const minSat = state.toner.darkModeInvert ? 42 : 18;
+    const minVal = state.toner.darkModeInvert ? 38 : 10;
+
     for (let p = 0; p < totalPixels; p += 2) {
       sampled++;
       const sat = s[p];
       const val = v[p];
-      if (sat >= 18 && val >= 10 && val <= 96) {
+      if (sat >= minSat && val >= minVal && val <= 96) {
         const hIdx = Math.floor(((h[p] + 10) % 360) / 20);
         const vBand = val < 55 ? 0 : 1;
         const bIdx = hIdx * 2 + vBand;
@@ -1117,7 +1182,10 @@ const AppController = {
     }
 
     const minCount = Math.max(20, sampled * 0.00012);
-    const candidates = buckets.filter((b) => b.count >= minCount).sort((a, b) => b.count - a.count);
+    const maxCount = state.toner.darkModeInvert ? sampled * 0.35 : totalPixels;
+    const candidates = buckets
+      .filter((b) => b.count >= minCount && b.count <= maxCount)
+      .sort((a, b) => b.count - a.count);
 
     let addedCount = 0;
 
@@ -1592,6 +1660,7 @@ const AppController = {
       setTimeout(() => URL.revokeObjectURL(url), 10000);
 
       this.setStatus(`Export complete: ${outName}`);
+      this.showStarToast();
     } catch (err) {
       console.error("PDF Export Failure:", err);
       this.setStatus(`Export failed: ${err.message}`, true);

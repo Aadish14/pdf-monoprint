@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PDF MonoPrint — Distinguish Colors in Monochrome PDFs</title>
   <meta name="description" content="Make Colors Distinguishable in Black &amp; White PDFs when you print with your laser or black &amp; white printer. Maps color charts into distinct hatch patterns, textures, and outlines." />
+  <meta name="keywords" content="PDF black and white converter, monochrome PDF printer, print color charts black and white, PDF hatch pattern, toner saver, accessible PDF printing, offline PDF tool" />
+  <link rel="canonical" href="https://aadish14.github.io/pdf-monoprint/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://aadish14.github.io/pdf-monoprint/" />
+  <meta property="og:title" content="PDF MonoPrint — Make Colors Distinguishable in Black &amp; White PDFs" />
+  <meta property="og:description" content="Stop color charts and slides from turning into identical gray mud on black &amp; white laser printers. Maps colors to distinct hatch patterns and outlines — 100% in-browser &amp; private." />
+  <meta property="og:image" content="https://aadish14.github.io/pdf-monoprint/assets/social-preview.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="PDF MonoPrint — Make Colors Distinguishable in Black &amp; White PDFs" />
+  <meta name="twitter:description" content="Convert color PDF charts into distinct hatch patterns &amp; outlines for monochrome laser printers. 100% client-side, zero uploads." />
+  <meta name="twitter:image" content="https://aadish14.github.io/pdf-monoprint/assets/social-preview.png" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -12,7 +25,24 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=2.3" />
+  <link rel="stylesheet" href="style.css?v=2.4" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PDF MonoPrint",
+    "url": "https://aadish14.github.io/pdf-monoprint/",
+    "description": "Make Colors Distinguishable in Black & White PDFs when printing on monochrome laser printers. Maps colors to hatch patterns, textures, and contrast outlines 100% locally in-browser.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "license": "https://opensource.org/licenses/MIT",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
   <!-- Local air-gapped libraries -->
   <script src="vendor/pdf.min.js"></script>
   <script src="vendor/jspdf.umd.min.js"></script>
@@ -91,6 +121,14 @@
           <span class="drop-zone-sub">or click to browse local files</span>
           <span id="fileNameDisplay" class="file-name-pill hidden"></span>
         </label>
+        <div class="sample-action-row">
+          <button id="loadSampleBtn" type="button" class="sample-btn" title="Load a sample multi-color slide &amp; chart PDF">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Try Sample Chart PDF</span>
+          </button>
+        </div>
         <p class="hint drop-hint">
           Processed offline in memory. No network connection required.
         </p>
@@ -285,12 +323,25 @@
     </section>
   </main>
 
+  <div id="starToast" class="star-toast hidden" role="status" aria-live="polite">
+    <div class="star-toast-body">
+      <span class="star-toast-title">PDF downloaded! Saved your printout?</span>
+      <span class="star-toast-sub">Help others find this free offline tool by starring it on GitHub.</span>
+    </div>
+    <div class="star-toast-actions">
+      <a href="https://github.com/Aadish14/pdf-monoprint" target="_blank" rel="noopener noreferrer" class="star-toast-cta">
+        &#9733; Star on GitHub
+      </a>
+      <button id="dismissStarToastBtn" type="button" class="star-toast-close" aria-label="Dismiss notification">&times;</button>
+    </div>
+  </div>
+
   <footer class="app-footer">
     <p>
       PDF MonoPrint &bull; Developed by Aadish &bull; Free &amp; Open Source under MIT License
     </p>
   </footer>
 
-  <script src="app.js?v=2.3"></script>
+  <script src="app.js?v=2.4"></script>
 </body>
 </html>
